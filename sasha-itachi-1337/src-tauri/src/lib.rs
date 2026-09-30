@@ -8,7 +8,13 @@ pub fn run() {
             description: "create_message_table",
             sql: include_str!("../migrations/0001_initial.sql"),
             kind: MigrationKind::Up,
-        }
+        },
+        Migration {
+            version: 2,
+            description: "add_updated_at",
+            sql: include_str!("../migrations/0002_add_updated_at.sql"),
+            kind: MigrationKind::Up,
+        },
     ];
 
     tauri::Builder::default()

@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import MessageBubble from "./MessageBubble.vue";
-
-import type {Message} from "../types/message.ts";
+import type { Message } from "../types/message.ts";
 
 defineProps<{
   messages: Message[];
+}>();
+
+const emit = defineEmits<{
+  edit: [id: number, body: string];
+  delete: [id: number];
 }>();
 </script>
 
 <template>
   <div class="messages">
-    <div
-        v-if="messages.length === 0"
-        class="empty"
-    >
+    <div v-if="messages.length === 0" class="empty">
       <strong>Пока пусто</strong>
       <span>Напишите первое сообщение</span>
     </div>
@@ -21,7 +22,10 @@ defineProps<{
     <MessageBubble
         v-for="message in messages"
         :key="message.id"
-        :message="message"/>
+        :message="message"
+        @edit="(id, body) => emit('edit', id, body)"
+        @delete="(id) => emit('delete', id)"
+    />
   </div>
 </template>
 
@@ -36,7 +40,7 @@ defineProps<{
   min-height: 0;
 }
 
-.empty{
+.empty {
   margin: auto;
   display: flex;
   flex-direction: column;

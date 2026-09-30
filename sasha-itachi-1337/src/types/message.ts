@@ -1,6 +1,7 @@
 export interface Message {
-    id:number;
+    id: number;
     author: string;
-    body:string;
-    created_at:string;
+    body: string;
+    created_at: string;
+    updated_at: string | null;
 }
