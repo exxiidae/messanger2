@@ -15,17 +15,20 @@ pub fn run() {
             sql: include_str!("../migrations/0002_add_updated_at.sql"),
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 3,
+            description: "users_and_chats",
+            sql: include_str!("../migrations/0003_users_chats.sql"),
+            kind: MigrationKind::Up,
+        },
     ];
 
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(
             tauri_plugin_sql::Builder::default()
-                .add_migrations(
-                    "sqlite:messenger.db",
-                    migrations
-                )
-                .build()
+                .add_migrations("sqlite:messenger.db", migrations)
+                .build(),
         )
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_opener::init())

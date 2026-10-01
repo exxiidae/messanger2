@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-
 import Database from "@tauri-apps/plugin-sql";
 
 import AppHeader from "./components/AppHeader.vue";
@@ -10,25 +9,60 @@ import MessageComposer from "./components/MessageComposer.vue";
 import type { Message } from "./types/message.ts";
 
 const messages = ref<Message[]>([]);
+const status = ref("Локальная история сообщений");
 
-const status = ref("Гомер бартов выпустил");
+const users = ["Олег", "Миша", "Кирилл"];
+const currentUser = ref(localStorage.getItem("currentUser") || "Олег");
 
 let db: Database | null = null;
+let currentUserId = 1;
 
 async function loadMessages() {
   if (!db) return;
 
   messages.value = await db.select<Message[]>(
-      "SELECT id, author, body, created_at, updated_at FROM messages ORDER BY id ASC"
+      `SELECT
+       m.id,
+       m.chat_id,
+       m.author_id,
+       u.display_name AS author,
+       m.type,
+       m.body,
+       m.attachment,
+       m.created_at,
+       m.updated_at
+     FROM messages m
+     JOIN users u ON u.id = m.author_id
+     WHERE m.chat_id = 1
+     ORDER BY m.id ASC`
   );
 }
 
-async function sendMessage(body: string) {
+async function resolveCurrentUserId() {
+  if (!db) return;
+  const rows = await db.select<{ id: number }[]>(
+      "SELECT id FROM users WHERE display_name = $1 LIMIT 1",
+      [currentUser.value]
+  );
+  currentUserId = rows[0]?.id ?? 1;
+}
+
+function changeUser(name: string) {
+  currentUser.value = name;
+  localStorage.setItem("currentUser", name);
+  resolveCurrentUserId();
+}
+
+async function sendMessage(payload: { body?: string; attachment?: string }) {
   if (!db) return;
 
+  const type = payload.attachment ? "image" : "text";
+  const body = payload.attachment ? null : payload.body;
+  const attachment = payload.attachment ?? null;
+
   await db.execute(
-      "INSERT INTO messages (author, body) VALUES ($1, $2)",
-      ["Вы", body]
+      "INSERT INTO messages (chat_id, author_id, type, body, attachment) VALUES ($1, $2, $3, $4, $5)",
+      [1, currentUserId, type, body, attachment]
   );
 
   await loadMessages();
@@ -36,29 +70,27 @@ async function sendMessage(body: string) {
 
 async function editMessage(id: number, newBody: string) {
   if (!db) return;
-
   await db.execute(
-      "UPDATE messages SET body = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2",
-      [newBody, id]
+      "UPDATE messages SET body = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2 AND author_id = $3",
+      [newBody, id, currentUserId]
   );
-
   await loadMessages();
 }
 
 async function deleteMessage(id: number) {
   if (!db) return;
-
-  await db.execute("DELETE FROM messages WHERE id = $1", [id]);
-
+  await db.execute(
+      "DELETE FROM messages WHERE id = $1 AND author_id = $2",
+      [id, currentUserId]
+  );
   await loadMessages();
 }
 
 onMounted(async () => {
   try {
     db = await Database.load("sqlite:messenger.db");
-
+    await resolveCurrentUserId();
     await loadMessages();
-
     status.value = "Локальная история сообщений";
   } catch (error) {
     console.error(error);
@@ -69,7 +101,12 @@ onMounted(async () => {
 
 <template>
   <main class="app">
-    <AppHeader :status="status" />
+    <AppHeader
+        :status="status"
+        :current-user="currentUser"
+        :users="users"
+        @change-user="changeUser"
+    />
     <section class="chat">
       <div class="chat-info">
         <h2>Первый чат</h2>
@@ -78,6 +115,7 @@ onMounted(async () => {
 
       <MessageList
           :messages="messages"
+          :current-user="currentUser"
           @edit="editMessage"
           @delete="deleteMessage"
       />

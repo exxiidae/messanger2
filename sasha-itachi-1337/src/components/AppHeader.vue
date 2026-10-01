@@ -1,34 +1,38 @@
 <script setup lang="ts">
-
 defineProps<{
-  status:string;
+  status: string;
+  currentUser: string;
+  users: string[];
 }>();
 
+const emit = defineEmits<{
+  changeUser: [name: string];
+}>();
 </script>
 
 <template>
   <header class="header">
     <div>
-      <h1></h1>
-      <p>{{status}}</p>
+      <p>{{ status }}</p>
     </div>
-    <span class="badge">
-        local
-      </span>
+
+    <div class="users">
+      <button
+          v-for="user in users"
+          :key="user"
+          type="button"
+          class="user-btn"
+          :class="{ active: user === currentUser }"
+          @click="emit('changeUser', user)"
+      >
+        {{ user }}
+      </button>
+    </div>
   </header>
 </template>
 
 <style scoped>
-
-.badge{
-  padding: 6px 12px;
-  border: 1px solid #343842;
-  border-radius: 6px;
-  color: #afb5c0;
-  background: #20232a;
-  font-size: 12px;
-}
-.header{
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,14 +42,35 @@ defineProps<{
   flex-shrink: 0;
 }
 
-.header h1{
+.header p {
   margin: 0;
-  font-size: 18px;
-}
-
-.header p{
-  margin: 4px 0 0;
   font-size: 12px;
   color: #8f96a3;
+}
+
+.users {
+  display: flex;
+  gap: 8px;
+}
+
+.user-btn {
+  padding: 6px 12px;
+  border: 1px solid #343842;
+  border-radius: 6px;
+  background: #20232a;
+  color: #afb5c0;
+  font-size: 12px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.user-btn:hover {
+  background: #2a2e36;
+}
+
+.user-btn.active {
+  background: #386be0;
+  border-color: #4f7fea;
+  color: white;
 }
 </style>
