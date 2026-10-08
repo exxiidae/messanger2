@@ -22,6 +22,12 @@ const theme = ref<"dark" | "light">(
     (localStorage.getItem("theme") as "dark" | "light") || "dark"
 );
 const settingsOpen = ref(false);
+const viewingUser = ref<User | null>(null);
+
+function viewUserProfile(authorName: string) {
+  viewingUser.value =
+      dbUsers.value.find((u) => u.display_name === authorName) ?? null;
+}
 const avatarPickerOpen = ref(false);
 
 const users = computed(() =>
@@ -219,6 +225,7 @@ onMounted(async () => {
             :users="dbUsers"
             @edit="editMessage"
             @delete="deleteMessage"
+            @view-profile="viewUserProfile"
         />
 
         <MessageComposer @send="sendMessage" />
@@ -247,6 +254,16 @@ onMounted(async () => {
         :username="currentUserRecord.username"
         @close="avatarPickerOpen = false"
         @pick="(path) => { updateAvatar(path); avatarPickerOpen = false; }"
+    />
+    <SettingsModal
+        v-if="viewingUser"
+        :theme="theme"
+        :current-user="viewingUser"
+        :readonly="true"
+        @close="viewingUser = null"
+        @change-theme="changeTheme"
+        @update-profile="() => {}"
+        @open-avatar-picker="() => {}"
     />
   </main>
 </template>

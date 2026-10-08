@@ -13,6 +13,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   edit: [id: number, body: string];
   delete: [id: number];
+  viewProfile: [authorName: string];
 }>();
 
 const isMine = computed(() => props.message.author === props.currentUser);
@@ -107,6 +108,8 @@ function closeImage() { imageOpened.value = false; }
         :name="message.author"
         :avatar-path="avatarPath ?? null"
         :size="32"
+        class="clickable-avatar"
+        @click="emit('viewProfile', message.author)"
     />
 
     <article
@@ -172,6 +175,15 @@ function closeImage() { imageOpened.value = false; }
 
 .message-row:not(.mine) {
   align-self: flex-start;
+}
+
+.clickable-avatar {
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.clickable-avatar:hover {
+  transform: scale(1.08);
 }
 
 .message {

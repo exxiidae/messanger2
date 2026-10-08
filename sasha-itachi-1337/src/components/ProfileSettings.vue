@@ -5,6 +5,7 @@ import type { User } from "../types/message.ts";
 
 const props = defineProps<{
   user: User | null;
+  readonly?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -36,22 +37,44 @@ function save() {
   <div v-if="user" class="profile">
     <div class="avatar-row">
       <Avatar :name="user.display_name" :avatar-path="user.avatar_path" :size="72" />
-      <button type="button" class="change-avatar-btn" @click="emit('openAvatarPicker')">
+      <button
+          v-if="!readonly"
+          type="button"
+          class="change-avatar-btn"
+          @click="emit('openAvatarPicker')"
+      >
         Сменить аватар
       </button>
     </div>
 
     <div class="field">
       <label>Отображаемое имя</label>
-      <input v-model="draftName" type="text" />
+      <input
+          v-if="!readonly"
+          v-model="draftName"
+          type="text"
+      />
+      <p v-else class="readonly-text">{{ user.display_name }}</p>
     </div>
 
     <div class="field">
       <label>Username</label>
-      <input v-model="draftUsername" type="text" />
+      <input
+          v-if="!readonly"
+          v-model="draftUsername"
+          type="text"
+      />
+      <p v-else class="readonly-text">@{{ user.username }}</p>
     </div>
 
-    <button type="button" class="save-btn" @click="save">Сохранить</button>
+    <button
+        v-if="!readonly"
+        type="button"
+        class="save-btn"
+        @click="save"
+    >
+      Сохранить
+    </button>
   </div>
 </template>
 
@@ -100,7 +123,20 @@ function save() {
   font: inherit;
 }
 
-.field input:focus { border-color: var(--accent-border); outline: none; }
+.field input:focus {
+  border-color: var(--accent-border);
+  outline: none;
+}
+
+.readonly-text {
+  margin: 0;
+  padding: 8px 12px;
+  border: 1px solid var(--border-soft);
+  border-radius: 6px;
+  background: var(--bg-element);
+  color: var(--text);
+  font-size: 14px;
+}
 
 .save-btn {
   align-self: flex-start;

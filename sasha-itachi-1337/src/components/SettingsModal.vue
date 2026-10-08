@@ -6,6 +6,7 @@ import type { User } from "../types/message.ts";
 defineProps<{
   theme: "dark" | "light";
   currentUser: User | null;
+  readonly?: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -32,7 +33,7 @@ const tabs: { id: Tab; label: string }[] = [
         <button class="close-btn" type="button" @click="emit('close')">×</button>
       </div>
 
-      <div class="tabs">
+      <div v-if="!readonly" class="tabs">
         <button
             v-for="tab in tabs"
             :key="tab.id"
@@ -47,13 +48,14 @@ const tabs: { id: Tab; label: string }[] = [
 
       <div class="modal-body">
         <ProfileSettings
-            v-if="activeTab === 'profile'"
+            v-if="readonly || activeTab === 'profile'"
             :user="currentUser"
+            :readonly="readonly"
             @update="(n, u) => emit('updateProfile', n, u)"
             @open-avatar-picker="emit('openAvatarPicker')"
         />
 
-        <div v-if="activeTab === 'theme'" class="setting-row">
+        <div v-if="!readonly && activeTab === 'theme'" class="setting-row">
           <span>Тема</span>
           <div class="theme-switch">
             <button

@@ -11,6 +11,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   edit: [id: number, body: string];
   delete: [id: number];
+  viewProfile: [authorName: string];
 }>();
 
 function avatarFor(author: string): string | null {
@@ -33,6 +34,7 @@ function avatarFor(author: string): string | null {
         :avatar-path="avatarFor(message.author)"
         @edit="(id, body) => emit('edit', id, body)"
         @delete="(id) => emit('delete', id)"
+        @view-profile="(name) => emit('viewProfile', name)"
     />
   </div>
 </template>
