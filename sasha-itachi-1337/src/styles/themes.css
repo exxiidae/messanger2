@@ -1,0 +1,44 @@
+:root {
+    /* Тёмная тема — по умолчанию */
+    --bg: #111318;
+    --bg-panel: #17191f;
+    --bg-element: #20232a;
+    --bg-hover: #2a2e36;
+    --border: #343842;
+    --border-soft: #292c34;
+    --text: #f2f3f5;
+    --text-muted: #8f96a3;
+    --text-dim: #858c98;
+    --accent: #386be0;
+    --accent-hover: #4779e8;
+    --accent-border: #4f7fea;
+    --danger: #ff7676;
+    --danger-bg-hover: #3a1e1e;
+    --msg-mine-bg: #386be0;
+    --msg-theirs-bg: #2a2e36;
+    --msg-mine-footer: #ccd8f7;
+    --msg-theirs-footer: #858c98;
+    --overlay: rgba(0, 0, 0, 0.5);
+}
+
+:root[data-theme="light"] {
+    --bg: #ffffff;
+    --bg-panel: #f5f5f5;
+    --bg-element: #eaeaea;
+    --bg-hover: #e0e0e0;
+    --border: #d0d0d0;
+    --border-soft: #e5e5e5;
+    --text: #111111;
+    --text-muted: #555555;
+    --text-dim: #777777;
+    --accent: #386be0;
+    --accent-hover: #4779e8;
+    --accent-border: #4f7fea;
+    --danger: #d32f2f;
+    --danger-bg-hover: #fde0e0;
+    --msg-mine-bg: #386be0;
+    --msg-theirs-bg: #e5e5e5;
+    --msg-mine-footer: #ccd8f7;
+    --msg-theirs-footer: #555555;
+    --overlay: rgba(0, 0, 0, 0.35);
+}

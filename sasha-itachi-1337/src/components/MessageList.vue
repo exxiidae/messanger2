@@ -1,16 +1,21 @@
 <script setup lang="ts">
 import MessageBubble from "./MessageBubble.vue";
-import type { Message } from "../types/message.ts";
+import type { Message, User } from "../types/message.ts";
 
-defineProps<{
+const props = defineProps<{
   messages: Message[];
   currentUser: string;
+  users: User[];
 }>();
 
 const emit = defineEmits<{
   edit: [id: number, body: string];
   delete: [id: number];
 }>();
+
+function avatarFor(author: string): string | null {
+  return props.users.find((u) => u.display_name === author)?.avatar_path ?? null;
+}
 </script>
 
 <template>
@@ -25,6 +30,7 @@ const emit = defineEmits<{
         :key="message.id"
         :message="message"
         :current-user="currentUser"
+        :avatar-path="avatarFor(message.author)"
         @edit="(id, body) => emit('edit', id, body)"
         @delete="(id) => emit('delete', id)"
     />
@@ -48,6 +54,6 @@ const emit = defineEmits<{
   flex-direction: column;
   gap: 6px;
   text-align: center;
-  color: #858c98;
+  color: var(--text-dim);
 }
 </style>

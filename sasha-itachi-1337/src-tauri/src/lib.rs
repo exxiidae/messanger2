@@ -21,6 +21,12 @@ pub fn run() {
             sql: include_str!("../migrations/0003_users_chats.sql"),
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 4,
+            description: "soft_delete",
+            sql: include_str!("../migrations/0004_soft_delete.sql"),
+            kind: MigrationKind::Up,
+        },
     ];
 
     tauri::Builder::default()
